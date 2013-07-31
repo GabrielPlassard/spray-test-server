@@ -6,6 +6,7 @@ import spray.httpx.encoding.{Deflate, Gzip}
 import akka.actor.Actor
 import spray.routing.HttpService
 import spray.http._
+import org.slf4j.LoggerFactory
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -25,30 +26,40 @@ class MyServiceActor extends Actor with MyService {
 // this trait defines our service behavior independently from the service actor
 trait MyService extends HttpService {
 
+  val logger = LoggerFactory.getLogger("com.example.MyService")
+
   val myRoute =
       path("") {
         ctx => ctx.complete(s"Headers :\n\t${ctx.request.headers.mkString("\n\t")} \n\nRequete.entity : \n${ctx.request.entity} \n\n")
       } ~
+      path("verb"){
+         ctx => ctx.complete(ctx.request.method.toString())
+      } ~
+      path("getQuery"){
+        parameterSeq{ p =>
+          complete{
+            logger.debug("Get request parameters are : " + p)
+            val concat = p.foldLeft("")( (acc,kv) => acc + kv._2).mkString("")
+            logger.debug("Concatenation of values is : " + concat)
+            val sha1 = java.security.MessageDigest.getInstance("SHA-1").digest( concat.getBytes ).map("%02x".format(_)).mkString
+            logger.debug("SHA-1 is : "+sha1)
+            sha1
+          }
+         }
+      } ~
       path("admin") {
-        authenticate(BasicAuth()) {
-          user =>
-            complete {
-              "This is the admin page"
-            }
+        authenticate(BasicAuth()) { user =>
+            ctx => ctx.complete("This is the admin page")
         }
       } ~
       path("gzipResponse") {
         encodeResponse(Gzip) {
-          complete {
-            "Here is my response in gzip"
-          }
+          ctx => ctx.complete("Here is my response in gzip")
         }
       } ~
       path("deflateResponse") {
         encodeResponse(Deflate) {
-           complete {
-            "Here is my response in deflate"
-          }
+           ctx => ctx.complete("Here is my response in deflate")
         }
       } ~
       path("gzipRequest") {
