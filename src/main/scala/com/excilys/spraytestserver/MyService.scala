@@ -53,6 +53,16 @@ trait MyService extends HttpService {
             ctx => ctx.complete( Utils.soapXml )
           }
       } ~
+      path("jsonObject"){
+        respondWithMediaType(`application/json`){
+          ctx => ctx.complete( Utils.jsonObject )
+        }
+      } ~
+      path("jsonArray"){
+        respondWithMediaType(`application/json`){
+          ctx => ctx.complete( Utils.jsonArray )
+        }
+      } ~
       path("admin") {
         authenticate(BasicAuth()) { user =>
             ctx => ctx.complete("This is the admin page")
