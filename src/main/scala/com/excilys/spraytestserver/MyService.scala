@@ -9,7 +9,7 @@ import spray.http._
 import org.slf4j.LoggerFactory
 import org.apache.commons.codec.digest.DigestUtils
 import MediaTypes._
-
+import HttpHeaders._
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -63,6 +63,19 @@ trait MyService extends HttpService {
           ctx => ctx.complete( Utils.jsonArray )
         }
       } ~
+      pathPrefix("cookies"){
+         path("take"){
+           respondWithHeader(`Set-Cookie`(HttpCookie("key", "value", path = Some("/cookies") ))) {
+             ctx => ctx.complete("Here is a cookie for you")
+           }
+         } ~
+         path("countCookies"){
+             ctx => ctx.complete(s"You have ${ctx.request.cookies.size} cookie(s) for me")
+         }
+      } ~
+      path("countCookies"){
+        ctx => ctx.complete(s"You have ${ctx.request.cookies.size} cookie(s) for me")
+      }
       path("admin") {
         authenticate(BasicAuth()) { user =>
             ctx => ctx.complete("This is the admin page")
