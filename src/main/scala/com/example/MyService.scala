@@ -7,6 +7,7 @@ import akka.actor.Actor
 import spray.routing.HttpService
 import spray.http._
 import org.slf4j.LoggerFactory
+import org.apache.commons.codec.digest.DigestUtils
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -37,14 +38,7 @@ trait MyService extends HttpService {
       } ~
       path("getQuery"){
         parameterSeq{ p =>
-          complete{
-            logger.debug("Get request parameters are : " + p)
-            val concat = p.foldLeft("")( (acc,kv) => acc + kv._2).mkString("")
-            logger.debug("Concatenation of values is : " + concat)
-            val sha1 = java.security.MessageDigest.getInstance("SHA-1").digest( concat.getBytes ).map("%02x".format(_)).mkString
-            logger.debug("SHA-1 is : "+sha1)
-            sha1
-          }
+            ctx => ctx.complete( hashQueryParameters(p) )
          }
       } ~
       path("admin") {
@@ -93,6 +87,15 @@ trait MyService extends HttpService {
       "<li>" + DateTime.now.toIsoDateTimeString + "</li>"
     }
     streamStart #:: secondStream.take(15) #::: streamEnd #:: Stream.empty
+  }
+
+  def hashQueryParameters(p : Seq[(String,String)]) = {
+    logger.debug("Request parameters are : " + p.mkString(","))
+    val concat = p.foldLeft("")( (acc,kv) => acc + kv._2).mkString("")
+    logger.debug("Concatenation of values is : " + concat)
+    val sha1 = DigestUtils.sha1Hex(concat)
+    logger.debug("SHA-1 is : "+sha1)
+    sha1
   }
 
 }
