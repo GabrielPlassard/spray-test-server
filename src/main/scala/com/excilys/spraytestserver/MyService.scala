@@ -48,6 +48,11 @@ trait MyService extends HttpService {
           ctx => ctx.complete( Utils.htmlIpsum )
         }
       } ~
+      path("soapXml"){
+          respondWithMediaType(`text/xml`) {
+            ctx => ctx.complete( Utils.soapXml )
+          }
+      } ~
       path("admin") {
         authenticate(BasicAuth()) { user =>
             ctx => ctx.complete("This is the admin page")

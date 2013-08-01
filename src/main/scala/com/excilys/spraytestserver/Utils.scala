@@ -46,4 +46,43 @@ object Utils {
     </html>
   }
 
+  val soapXml =     "<?xml version='1.0' encoding='UTF-8' ?>\n" + {
+      <SOAP-ENV:Envelope
+      xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+      xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Body>
+          <ns1:getEmployeeDetailsResponse
+          xmlns:ns1="urn:MySoapServices"
+          SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <return xsi:type="ns1:EmployeeContactDetail">
+              <employeeName xsi:type="xsd:string">Bill Posters</employeeName>
+              <phoneNumber xsi:type="xsd:string">+1-212-7370194</phoneNumber>
+              <tempPhoneNumber
+              xmlns:ns2="http://schemas.xmlsoap.org/soap/encoding/"
+              xsi:type="ns2:Array"
+              ns2:arrayType="ns1:TemporaryPhoneNumber[3]">
+                <item xsi:type="ns1:TemporaryPhoneNumber">
+                  <startDate xsi:type="xsd:int">37060</startDate>
+                  <endDate xsi:type="xsd:int">37064</endDate>
+                  <phoneNumber xsi:type="xsd:string">+1-515-2887505</phoneNumber>
+                </item>
+                <item xsi:type="ns1:TemporaryPhoneNumber">
+                  <startDate xsi:type="xsd:int">37074</startDate>
+                  <endDate xsi:type="xsd:int">37078</endDate>
+                  <phoneNumber xsi:type="xsd:string">+1-516-2890033</phoneNumber>
+                </item>
+                <item xsi:type="ns1:TemporaryPhoneNumber">
+                  <startDate xsi:type="xsd:int">37088</startDate>
+                  <endDate xsi:type="xsd:int">37092</endDate>
+                  <phoneNumber xsi:type="xsd:string">+1-212-7376609</phoneNumber>
+                </item>
+              </tempPhoneNumber>
+            </return>
+          </ns1:getEmployeeDetailsResponse>
+        </SOAP-ENV:Body>
+      </SOAP-ENV:Envelope>
+  }.toString
+
+
 }
