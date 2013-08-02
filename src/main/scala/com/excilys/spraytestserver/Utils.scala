@@ -1,6 +1,15 @@
 package com.excilys.spraytestserver
 
+import spray.http._
+
 object Utils {
+
+  case class Expires(date: DateTime) extends HttpHeader{
+    def name: String = "Expires"
+    def value: String = date.toRfc1123DateTimeString
+    def lowercaseName: String = name.toLowerCase
+    def render[R <: Rendering](r: R): r.type = r ~~ name ~~ ':' ~~ ' ' ~~ value
+  }
 
   val htmlIpsum = {
     <html>

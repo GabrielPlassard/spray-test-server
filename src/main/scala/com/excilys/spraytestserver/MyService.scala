@@ -6,10 +6,12 @@ import spray.httpx.encoding.{Deflate, Gzip}
 import akka.actor.Actor
 import spray.routing.HttpService
 import spray.http._
-import org.slf4j.LoggerFactory
 import org.apache.commons.codec.digest.DigestUtils
 import MediaTypes._
 import HttpHeaders._
+import com.typesafe.scalalogging.slf4j.Logging
+import CacheDirectives._
+import com.excilys.spraytestserver.Utils.Expires
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -27,9 +29,9 @@ class MyServiceActor extends Actor with MyService {
 
 
 // this trait defines our service behavior independently from the service actor
-trait MyService extends HttpService {
+trait MyService extends HttpService with Logging {
 
-  val logger = LoggerFactory.getLogger("com.excilys.spraytestserver.MyService")
+  var cacheCalls = 0
 
   val myRoute =
       path("") {
@@ -75,7 +77,25 @@ trait MyService extends HttpService {
       } ~
       path("countCookies"){
         ctx => ctx.complete(s"You have ${ctx.request.cookies.size} cookie(s) for me")
-      }
+      } ~
+      pathPrefix("cache") {
+        path("expires") {
+          respondWithHeader(Expires(DateTime(2050, 12, 25))) {
+            ctx => {
+              cacheCalls += 1
+              ctx.complete(s"You called me ${cacheCalls} time(s)")
+            }
+          }
+        } ~
+        path("maxAge"){
+          respondWithHeader(`Cache-Control`( `max-age`(300) )) {
+            ctx => {
+              cacheCalls += 1
+              ctx.complete(s"You called me ${cacheCalls} time(s)")
+            }
+          }
+        }
+      }~
       path("admin") {
         authenticate(BasicAuth()) { user =>
             ctx => ctx.complete("This is the admin page")

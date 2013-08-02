@@ -21,8 +21,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"   	%%  "akka-actor"        	% "2.2.0-RC1",
   "com.typesafe.akka"   	%%  "akka-testkit"      	% "2.2.0-RC1" % "test",
   "org.specs2"          	%%  "specs2"            	% "1.14" % "test",
-  "org.slf4j"           	%   "slf4j-api"         	% "1.7.5",
-  "ch.qos.logback"     		%   "logback-classic"   	% "1.0.13",
+  "com.typesafe"            %% "scalalogging-slf4j"     % "1.0.1",
   "org.apache.directory.studio" % "org.apache.commons.codec" 	% "1.8"
 )
 
