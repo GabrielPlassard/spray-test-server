@@ -67,8 +67,13 @@ trait MyService extends HttpService with Logging {
       } ~
       pathPrefix("cookies"){
          path("take"){
-           respondWithHeader(`Set-Cookie`(HttpCookie("key", "value", path = Some("/cookies") ))) {
-             ctx => ctx.complete("Here is a cookie for you")
+           parameterMap{p =>
+             val name = p.get("name").getOrElse[String]("name")
+             val value = p.get("value").getOrElse[String]("value")
+             val path = p.get("path").getOrElse[String]("/cookies")
+             respondWithHeader(`Set-Cookie`(HttpCookie(name,value, path = Some(path) ))) {
+               ctx => ctx.complete("Here is a cookie for you")
+             }
            }
          } ~
          path("countCookies"){
@@ -96,6 +101,11 @@ trait MyService extends HttpService with Logging {
           }
         }
       }~
+      path("redirect"){
+        parameterMap{ p =>
+          redirect(p.get("target").getOrElse[String]("/"), StatusCodes.SeeOther)
+        }
+      } ~
       path("admin") {
         authenticate(BasicAuth()) { user =>
             ctx => ctx.complete("This is the admin page")
@@ -103,12 +113,16 @@ trait MyService extends HttpService with Logging {
       } ~
       path("gzipResponse") {
         encodeResponse(Gzip) {
-          ctx => ctx.complete("Here is my response in gzip")
+          parameterMap{ p =>
+            ctx => ctx.complete(p.get("response").getOrElse("Gzip response"))
+          }
         }
       } ~
       path("deflateResponse") {
         encodeResponse(Deflate) {
-           ctx => ctx.complete("Here is my response in deflate")
+           parameterMap{ p =>
+             ctx => ctx.complete(p.get("response").getOrElse("Deflate response"))
+           }
         }
       } ~
       path("gzipRequest") {
