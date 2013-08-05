@@ -37,6 +37,11 @@ trait MyService extends HttpService with Logging {
       path("") {
         ctx => ctx.complete(s"Headers :\n\t${ctx.request.headers.mkString("\n\t")} \n\nRequete.entity : \n${ctx.request.entity} \n\n")
       } ~
+      path("statusCode"){
+         parameter("value"){ p =>
+            ctx => ctx.complete(StatusCode.int2StatusCode(p.toInt))
+         }
+      } ~
       path("verb"){
          ctx => ctx.complete(ctx.request.method.toString())
       } ~
@@ -100,7 +105,7 @@ trait MyService extends HttpService with Logging {
             }
           }
         }
-      }~
+      } ~
       path("redirect"){
         parameterMap{ p =>
           redirect(p.get("target").getOrElse[String]("/"), StatusCodes.SeeOther)
