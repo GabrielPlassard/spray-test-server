@@ -104,6 +104,12 @@ trait MyService extends HttpService with Logging {
               ctx.complete(s"You called me ${cacheCalls} time(s)")
             }
           }
+        } ~
+        path("reset"){
+          ctx => {
+            cacheCalls = 0
+            ctx.complete("Ok")
+          }
         }
       } ~
       path("redirect"){
