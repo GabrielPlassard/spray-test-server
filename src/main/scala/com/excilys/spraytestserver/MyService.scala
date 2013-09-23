@@ -139,13 +139,13 @@ trait MyService extends HttpService with Logging {
         decodeRequest(Deflate) {
           ctx => ctx.complete(s"Headers :\n\t${ctx.request.headers.mkString("\n\t")} \n\nRequete.entity : \n${ctx.request.entity} \n\n")
         }
-      } ~
+      } /*~
       path("chunkResponse") {
           // we detach in order to move the blocking code inside the simpleStringStream off the service actor
           detachTo(singleRequestServiceActor) {
             complete(simpleStringStream)
         }
-      }
+      }*/
 
 
 
